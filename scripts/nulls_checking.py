@@ -32,6 +32,7 @@ for table, columns in all_columns.items():
         cur.execute(f"CALL CHECK_NULLS('{table_name}', '{column}')")
         total, successful, failed = cur.fetchone()
         print(f"{table}.{column}: total={total}, successful={successful}, failed={failed}")
+    print('-----------------------------------------------------------------')
 
 conn.close()
     
