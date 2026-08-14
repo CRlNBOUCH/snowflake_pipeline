@@ -1,0 +1,9 @@
+
+SELECT
+    ORDER_ID,
+    ORDER_ITEM_ID,
+    PRODUCT_ID,
+    SELLER_ID,
+    TRY_TO_DECIMAL(PRICE, 10, 3) AS PRICE,
+    TRY_TO_DECIMAL(FREIGHT_VALUE, 10, 3) AS FREIGHT_VALUE
+FROM {{ source('raw','order_items') }}

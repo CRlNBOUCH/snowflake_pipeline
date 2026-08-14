@@ -1,0 +1,75 @@
+version: 2
+
+models:
+
+  - name: mart_customer_ltv
+    columns:
+      - name: CUSTOMER_UNIQUE_ID
+        tests:
+          - unique
+          - not_null
+      - name: TOTAL_ORDERS
+        tests:
+          - not_null
+      - name: LIFETIME_VALUE
+        tests:
+          - not_null
+      - name: IS_CHURNED
+        tests:
+          - not_null
+          - accepted_values:
+              values: [true, false]
+
+
+  - name: mart_seller_performance
+    columns:
+      - name: SELLER_ID
+        tests:
+          - unique
+          - not_null
+      - name: TOTAL_ORDERS
+        tests:
+          - not_null
+      - name: TOTAL_REVENUE
+        tests:
+          - not_null
+
+
+  - name: mart_product_category_performance
+    columns:
+      - name: CATEGORY
+        tests:
+          - unique
+          - not_null
+      - name: TOTAL_REVENUE
+        tests:
+          - not_null
+      - name: TOTAL_ORDERS
+        tests:
+          - not_null
+
+
+  - name: mart_payment_behavior
+    columns:
+      - name: CUSTOMER_UNIQUE_ID
+        tests:
+          - unique
+          - not_null
+      - name: TOTAL_AMOUNT_PAID
+        tests:
+          - not_null
+      - name: PREFERRED_PAYMENT_TYPE
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['credit_card', 'boleto', 'voucher', 'debit_card']
+      - name: USES_INSTALLMENTS
+        tests:
+          - not_null
+          - accepted_values:
+              values: [true, false]
+      - name: USES_VOUCHERS
+        tests:
+          - not_null
+          - accepted_values:
+              values: [true, false]

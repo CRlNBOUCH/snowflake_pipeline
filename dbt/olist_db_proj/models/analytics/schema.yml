@@ -1,0 +1,174 @@
+version: 2
+
+models:
+  - name: dim_customers
+    columns:
+      - name: customer_id
+        tests:
+          - unique 
+          - not_null
+      
+      - name: customer_unique_id
+        tests: 
+          - not_null
+      
+      - name: customer_city
+        tests: 
+          - not_null
+
+      - name: customer_state
+        tests: 
+          - not_null
+      
+  - name: dim_sellers
+    columns:
+      - name: seller_id
+        tests: 
+          - unique 
+          - not_null
+      
+      - name: seller_city
+        tests: 
+          - not_null
+
+      - name: seller_state
+        tests: 
+          - not_null
+  
+  - name: dim_products
+    columns: 
+      - name: product_id
+        tests: 
+          - unique
+          - not_null
+      
+  
+  - name: dim_date
+    columns:
+      - name: date_key
+        tests: 
+          - unique 
+          - not_null
+      
+      - name: date_day 
+        tests:
+          - not_null
+  
+  - name: dim_payment_type
+    columns:
+      - name: payment_type_key
+        tests:
+          - unique 
+          - not_null
+  
+  - name: fact_orders
+    columns:
+      - name: order_id
+        tests:
+          - not_null
+      
+      - name: order_item_id
+        tests: 
+          - not_null
+      
+      - name: customer_id
+        tests: 
+          - not_null
+          - relationships:
+              to: ref('dim_customer_id')
+              field: customer_id
+
+      - name: product_id
+        tests: 
+          - not_null
+          - relationships:
+              to: ref('dim_products')
+              field: product_id
+
+      - name: seller_id
+        tests: 
+          - not_null
+          - relationships:
+              to: ref('dim_sellers')
+              field: seller_id
+      
+      - name: price 
+        tests:
+          - not_null
+      
+      - name: purchase_date_key
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_date')
+              field: date_key
+
+      - name: approved_date_key
+        tests:
+          - relationships:
+              to: ref('dim_date')
+              field: date_key
+
+      - name: delivered_carrier_date_key
+        tests:
+          - relationships:
+              to: ref('dim_date')
+              field: date_key
+
+      - name: delivered_customer_date_key
+        tests:
+          - relationships:
+              to: ref('dim_date')
+              field: date_key
+
+      - name: estimated_delivery_date_key
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_date')
+              field: date_key
+
+  - name: fact_payments
+    columns:
+      - name: order_id
+        tests: 
+          - not_null
+      
+      - name: payment_sequential
+        tests: 
+          - not_null
+      
+      - name: payment_type_key
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_payment_type')
+              field: payment_type_key
+      
+  - name: fact_reviews
+    columns:
+      - name: review_id
+        tests:
+          - not_null
+          - unique 
+      
+      - name: order_id
+        tests:
+          - not_null
+
+      - name: review_score
+        tests:
+          - not_null
+
+      - name: review_creation_date_key
+        tests:
+          - not_null
+          - relationships: 
+              to: ref('dim_date')
+              field: date_key
+
+      - name: review_answer_date_key
+        tests:
+          - relationships:
+              to: ref('dim_date')
+              field: date_key 
