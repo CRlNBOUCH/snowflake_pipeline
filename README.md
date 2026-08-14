@@ -1,1 +1,1 @@
-# snowflake_pipline
+# snowflake_pipeline
