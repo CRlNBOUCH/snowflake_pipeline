@@ -1,0 +1,174 @@
+version: 2
+
+sources:
+  - name : raw 
+    database: OLIST_DB
+    schema : RAW 
+    tables :
+      - name: orders
+      - name: order_items
+      - name: order_payments
+      - name: order_reviews
+      - name: customers
+      - name: geolocation
+      - name: products
+      - name: sellers
+      - name: product_category_translation
+
+models:
+ 
+  - name: stg_orders
+    columns:
+      - name: ORDER_ID
+        tests:
+          - unique
+          - not_null
+      - name: CUSTOMER_ID
+        tests:
+          - not_null
+      - name: ORDER_STATUS
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['delivered','shipped','canceled','unavailable',
+                       'invoiced','processing','approved','created']
+      - name: ORDER_PURCHASE_TS
+        tests:
+          - not_null
+      - name: ORDER_ESTIMATED_DELIVERY_DATE
+        tests:
+          - not_null
+ 
+  - name: stg_order_items
+    columns:
+      - name: ORDER_ID
+        tests:
+          - not_null
+      - name: ORDER_ITEM_ID
+        tests:
+          - not_null
+      - name: PRODUCT_ID
+        tests:
+          - not_null
+      - name: SELLER_ID
+        tests:
+          - not_null
+      - name: PRICE
+        tests:
+          - not_null
+      - name: FREIGHT_VALUE
+        tests:
+          - not_null
+
+  - name: stg_order_payments
+    columns:
+      - name: ORDER_ID
+        tests:
+          - not_null
+      - name: PAYMENT_SEQUENTIAL
+        tests:
+          - not_null
+      - name: PAYMENT_TYPE
+        tests:
+          - not_null
+      - name: PAYMENT_INSTALLMENTS
+        tests:
+          - not_null
+      - name: PAYMENT_VALUE
+        tests:
+          - not_null
+ 
+  - name: stg_order_reviews
+    columns:
+      - name: REVIEW_ID
+        tests:
+          - unique
+          - not_null
+      - name: ORDER_ID
+        tests:
+          - not_null
+      - name: REVIEW_SCORE
+        tests:
+          - not_null
+          - accepted_values:
+              values: [1, 2, 3, 4, 5]
+      - name: REVIEW_CREATION_DATE
+        tests:
+          - not_null
+      - name: REVIEW_ANSWER_TS
+        tests:
+          - not_null
+ 
+  - name: stg_customers
+    columns:
+      - name: CUSTOMER_ID
+        tests:
+          - unique
+          - not_null
+      - name: CUSTOMER_UNIQUE_ID
+        tests:
+          - not_null
+      - name: CUSTOMER_ZIP_CODE_PREFIX
+        tests:
+          - not_null
+      - name: CUSTOMER_CITY
+        tests:
+          - not_null
+      - name: CUSTOMER_STATE
+        tests:
+          - not_null
+ 
+  - name: stg_sellers
+    columns:
+      - name: SELLER_ID
+        tests:
+          - unique
+          - not_null
+      - name: SELLER_ZIP_CODE_PREFIX
+        tests:
+          - not_null
+      - name: SELLER_CITY
+        tests:
+          - not_null
+      - name: SELLER_STATE
+        tests:
+          - not_null
+ 
+  - name: stg_products
+    columns:
+      - name: PRODUCT_ID
+        tests:
+          - unique
+          - not_null
+ 
+  - name: stg_geolocation
+    columns:
+      - name: GEOLOCATION_ZIP_CODE_PREFIX
+        tests:
+          - not_null
+      - name: GEOLOCATION_LAT
+        tests:
+          - not_null
+      - name: GEOLOCATION_LNG
+        tests:
+          - not_null
+ 
+  - name: stg_agg_geolocation
+    columns:
+      - name: GEOLOCATION_ZIP_CODE_PREFIX
+        tests:
+          - unique
+          - not_null
+ 
+  - name: stg_product_category_translation
+    columns:
+      - name: PRODUCT_CATEGORY_NAME
+        tests:
+          - unique
+          - not_null
+      - name: PRODUCT_CATEGORY_NAME_ENGLISH
+        tests:
+          - not_null
+  
+
+ 

@@ -1,0 +1,16 @@
+{{ config(
+    post_hook=[
+        "ALTER TABLE {{ this }} ADD CONSTRAINT PK_DIM_SELLERS PRIMARY KEY (SELLER_ID)"
+    ]
+) }}
+
+SELECT
+    S.SELLER_ID,
+    S.SELLER_ZIP_CODE_PREFIX,
+    S.SELLER_CITY,
+    S.SELLER_STATE,
+    G.AVG_GEOLOCATION_LAT,
+    G.AVG_GEOLOCATION_LNG
+FROM {{ ref('stg_sellers') }} S 
+LEFT JOIN {{ ref('stg_agg_geolocation' )}} G
+ON S.SELLER_ZIP_CODE_PREFIX = G.GEOLOCATION_ZIP_CODE_PREFIX

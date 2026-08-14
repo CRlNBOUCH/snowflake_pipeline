@@ -1,0 +1,18 @@
+{{ config(
+    materialized='table',
+    post_hook="ALTER TABLE {{ this }} ADD CONSTRAINT PK_DIM_DATE PRIMARY KEY (DATE_KEY)"
+) }}
+
+SELECT
+    {{ to_date_key('DATE_DAY') }}  AS DATE_KEY,
+    DATE_DAY,
+    YEAR(DATE_DAY) AS YEAR,
+    MONTH(DATE_DAY) AS MONTH,
+    MONTHNAME(DATE_DAY) AS MONTH_NAME,
+    DAY(DATE_DAY) AS DAY,
+    DAYOFWEEK(DATE_DAY) AS DAY_OF_WEEK,
+    DAYNAME(DATE_DAY) AS DAY_NAME
+FROM (
+    SELECT DATEADD(DAY, SEQ4(), '{{ var("dim_date_start") }}') AS DATE_DAY
+    FROM TABLE(GENERATOR(ROWCOUNT =>  800))
+)

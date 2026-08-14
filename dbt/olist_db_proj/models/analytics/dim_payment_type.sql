@@ -1,0 +1,12 @@
+{{ config(
+    materialized='table',
+    post_hook="ALTER TABLE {{ this }} ADD CONSTRAINT PK_DIM_PAYMENT_TYPE PRIMARY KEY (PAYMENT_TYPE_KEY)"
+) }}
+
+SELECT
+    ROW_NUMBER() OVER (ORDER BY PAYMENT_TYPE) AS PAYMENT_TYPE_KEY,
+    PAYMENT_TYPE
+FROM (
+    SELECT DISTINCT PAYMENT_TYPE
+    FROM {{ ref('stg_order_payments') }}
+    WHERE PAYMENT_TYPE IS NOT NULL)
