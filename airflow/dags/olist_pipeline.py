@@ -37,6 +37,7 @@ with DAG(
             'raw/olist_sellers_dataset.csv',
             'raw/olist_product_category_translation_dataset.csv',
         ],
+        aws_conn_id='aws_default',
         poke_interval=30,
         timeout=300,
         mode='reschedule'
