@@ -8,3 +8,5 @@
 /dbt/olist_db_proj/logs/
 /dbt/olist_db_proj/dbt_internal_packages/
 /dbt/olist_db_proj/.user.yml
+/airflow/logs
+/airflow/dags/__pycache__
