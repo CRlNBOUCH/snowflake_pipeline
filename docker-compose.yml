@@ -1,0 +1,90 @@
+
+services:
+
+  postgres:
+    image: postgres:13
+    environment:
+      POSTGRES_USER: airflow
+      POSTGRES_PASSWORD: airflow
+      POSTGRES_DB: airflow
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: always
+
+  airflow-init:
+    build: .
+    depends_on:
+      - postgres
+    env_file:
+      - .env
+    environment:
+      - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow:airflow@postgres/airflow
+      - AIRFLOW__CORE__EXECUTOR=LocalExecutor
+      - AIRFLOW__CORE__LOAD_EXAMPLES=false
+      - AIRFLOW_CONN_SNOWFLAKE_DEFAULT=snowflake://${SNOWFLAKE_USER}:${SNOWFLAKE_PASSWORD}@${SNOWFLAKE_ACCOUNT}/${SNOWFLAKE_DATABASE}?role=${SNOWFLAKE_ROLE}&warehouse=${SNOWFLAKE_WAREHOUSE}
+    command: airflow db migrate
+    restart: on-failure
+
+  airflow-api-server:
+    build: .
+    depends_on:
+      - postgres
+      - airflow-init
+    env_file:
+      - .env
+    environment:
+      - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow:airflow@postgres/airflow
+      - AIRFLOW__CORE__EXECUTOR=LocalExecutor
+      - AIRFLOW__CORE__LOAD_EXAMPLES=false
+      - AIRFLOW__WEBSERVER__SECRET_KEY=olist_secret_key
+      - AIRFLOW_CONN_SNOWFLAKE_DEFAULT=snowflake://${SNOWFLAKE_USER}:${SNOWFLAKE_PASSWORD}@${SNOWFLAKE_ACCOUNT}/${SNOWFLAKE_DATABASE}?role=${SNOWFLAKE_ROLE}&warehouse=${SNOWFLAKE_WAREHOUSE}
+    volumes:
+      - ./airflow:/opt/airflow
+    ports:
+      - 8080:8080
+    command: airflow api-server
+    restart: always
+
+  airflow-scheduler:
+    build: .
+    depends_on:
+      - postgres
+      - airflow-init
+      - airflow-api-server
+    env_file:
+      - .env
+    environment:
+      - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow:airflow@postgres/airflow
+      - AIRFLOW__CORE__EXECUTOR=LocalExecutor
+      - AIRFLOW__CORE__LOAD_EXAMPLES=false
+      - AIRFLOW_CONN_SNOWFLAKE_DEFAULT=snowflake://${SNOWFLAKE_USER}:${SNOWFLAKE_PASSWORD}@${SNOWFLAKE_ACCOUNT}/${SNOWFLAKE_DATABASE}?role=${SNOWFLAKE_ROLE}&warehouse=${SNOWFLAKE_WAREHOUSE}
+      - AIRFLOW_CONN_AWS_DEFAULT=aws://${AWS_ACCESS_KEY_ID}:${AWS_SECRET_ACCESS_KEY}@/?region_name=${AWS_DEFAULT_REGION}
+      - AIRFLOW__CORE__EXECUTION_API_SERVER_URL=http://airflow-api-server:8080/execution/
+    volumes:
+      - ./airflow:/opt/airflow
+      - ./dbt/olist_db_proj:/opt/dbt
+      - ./ingestion:/opt/ingestion
+      - ./raw_data:/opt/raw_data
+    command: airflow scheduler
+    restart: always
+
+  airflow-dag-processor:
+    build: .
+    depends_on:
+      - postgres
+      - airflow-init
+    env_file:
+      - .env
+    environment:
+      - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow:airflow@postgres/airflow
+      - AIRFLOW__CORE__EXECUTOR=LocalExecutor
+      - AIRFLOW__CORE__LOAD_EXAMPLES=false
+      - AIRFLOW_CONN_SNOWFLAKE_DEFAULT=snowflake://${SNOWFLAKE_USER}:${SNOWFLAKE_PASSWORD}@${SNOWFLAKE_ACCOUNT}/${SNOWFLAKE_DATABASE}?role=${SNOWFLAKE_ROLE}&warehouse=${SNOWFLAKE_WAREHOUSE}
+      - AIRFLOW__CORE__EXECUTION_API_SERVER_URL=http://airflow-api-server:8080/execution/
+    volumes:
+      - ./airflow:/opt/airflow
+    command: airflow dag-processor
+    restart: always
+
+volumes:
+  postgres_data:

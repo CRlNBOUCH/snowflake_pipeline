@@ -1,3 +1,12 @@
 /raw_data
 /.vscode
 /logs
+.env
+/airflow/simple_auth_manager_passwords.json.generated
+/dbt/olist_db_proj/target/
+/dbt/olist_db_proj/dbt_packages/
+/dbt/olist_db_proj/logs/
+/dbt/olist_db_proj/dbt_internal_packages/
+/dbt/olist_db_proj/.user.yml
+/airflow/logs
+/airflow/dags/__pycache__
